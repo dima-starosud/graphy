@@ -1,0 +1,28 @@
+{
+  "name": "staro/graphy",
+  "type": "webapp",
+  "authors": [
+    {
+      "name": "Dmytro Starosud",
+      "email": "d.starosud@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "7.3.*",
+    "php-di/php-di": "6.0.2",
+    "psr/http-factory": "1.0.0",
+    "middlewares/fast-route": "1.1.0",
+    "middlewares/request-handler": "1.2.0",
+    "zendframework/zend-diactoros": "1.8.4",
+    "zendframework/zend-httphandlerrunner": "1.0.1",
+    "zendframework/zend-json": "3.1.0",
+    "zendframework/zend-db": "2.9.3",
+    "tuupola/slim-basic-auth": "3.2.1",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Staro\\Graphy\\": "src/"
+    }
+  }
+}
