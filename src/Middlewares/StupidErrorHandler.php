@@ -1,6 +1,6 @@
 <?php
 
-namespace Staro\Graphy;
+namespace Staro\Graphy\Middlewares;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

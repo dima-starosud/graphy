@@ -7,11 +7,11 @@ use Middlewares\FastRoute;
 use Middlewares\RequestHandler;
 use Middlewares\Utils\Factory\DiactorosFactory;
 use Psr\Http\Message\ResponseFactoryInterface;
-use Staro\Graphy\Logic\FileHistoryRepository;
-use Staro\Graphy\GenerateHandler;
-use Staro\Graphy\IndexHandler;
-use Staro\Graphy\Logic\StaticWorkersProvider;
-use Staro\Graphy\StupidErrorHandler;
+use Staro\Graphy\Handlers\UploadHandler;
+use Staro\Graphy\Logic\FileCache;
+use Staro\Graphy\Handlers\GenerateHandler;
+use Staro\Graphy\Handlers\MainPageHandler;
+use Staro\Graphy\Middlewares\StupidErrorHandler;
 use Tuupola\Middleware\HttpBasicAuthentication;
 use Middlewares\Utils\Dispatcher;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -36,11 +36,8 @@ $container = (new ContainerBuilder())
     ->useAnnotations( false )
     ->addDefinitions( [
         ResponseFactoryInterface::class => create( DiactorosFactory::class ),
-        StaticWorkersProvider::class    => function () {
-            return new StaticWorkersProvider( require DIR_NAME . '/private/workers.php' );
-        },
-        FileHistoryRepository::class    => function () {
-            return new FileHistoryRepository( DIR_NAME . '/private/history' );
+        FileCache::class                => function () {
+            return new FileCache( DIR_NAME . '/private/cache' );
         },
     ] )
     ->build();
@@ -50,8 +47,9 @@ $errorHandler = new StupidErrorHandler();
 $authHandler = new HttpBasicAuthentication( require DIR_NAME . '/private/authconfig.php' );
 
 $routes = simpleDispatcher( function (RouteCollector $r) {
-    $r->get( '/', IndexHandler::class );
+    $r->get( '/', MainPageHandler::class );
     $r->post( '/generate', GenerateHandler::class );
+    $r->post( '/upload', UploadHandler::class );
 } );
 
 $dispatcher = new Dispatcher( [

@@ -1,16 +1,16 @@
 <?php
 
 
-namespace Staro\Graphy;
+namespace Staro\Graphy\Handlers;
 
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Staro\Graphy\Logic\FileHistoryRepository;
+use Staro\Graphy\Logic\HistoryProvider;
 use Staro\Graphy\Logic\GenerationLogic;
-use Staro\Graphy\Logic\StaticWorkersProvider;
-use Zend\Diactoros\Response\HtmlResponse;
+use Staro\Graphy\Logic\WorkersProvider;
+use Zend\Diactoros\Response\JsonResponse;
 
 final class GenerateHandler implements RequestHandlerInterface {
     /**
@@ -18,28 +18,22 @@ final class GenerateHandler implements RequestHandlerInterface {
      */
     private $generationLogic;
     /**
-     * @var FileHistoryRepository
+     * @var HistoryProvider
      */
     private $historyRepository;
     /**
-     * @var StaticWorkersProvider
+     * @var WorkersProvider
      */
     private $workersProvider;
-    /**
-     * @var DayEditorHtml
-     */
-    private $dayEditorHtml;
 
     function __construct(
         GenerationLogic $generationLogic,
-        FileHistoryRepository $historyProvider,
-        StaticWorkersProvider $workersProvider,
-        DayEditorHtml $dayEditorHtml
+        HistoryProvider $historyProvider,
+        WorkersProvider $workersProvider
     ) {
         $this->generationLogic = $generationLogic;
         $this->historyRepository = $historyProvider;
         $this->workersProvider = $workersProvider;
-        $this->dayEditorHtml = $dayEditorHtml;
     }
 
     /**
@@ -49,18 +43,14 @@ final class GenerateHandler implements RequestHandlerInterface {
         $params = $request->getParsedBody();
         $date = date_parse( $params['date'] );
         unset( $params['date'] );
-        $month = $date['month'];
         $day = $date['day'];
         $team3count = intval( $params['team3count'] ?? 0 );
         unset( $params['team3count'] );
         $team2count = intval( $params['team2count'] ?? 0 );
         unset( $params['team2count'] );
         $ids = array_keys( $params );
-        $history = $this->historyRepository->getHistory( $month, $day );
+        $history = $this->historyRepository->getHistory( $day );
         $result = $this->generationLogic->generate( $team2count, $team3count, $ids, $history );
-        $this->historyRepository->storeHistory( $month, $day, $result );
-        ob_start();
-        $this->dayEditorHtml->echoHtml( $params['date'], $result );
-        return new HtmlResponse( ob_get_clean() );
+        return new JsonResponse( $result );
     }
 }
