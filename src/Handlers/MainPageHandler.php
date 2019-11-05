@@ -70,6 +70,19 @@ final class MainPageHandler implements RequestHandlerInterface {
         return new HtmlResponse( ob_get_clean() );
     }
 
+    private function renderUploadForm() {
+        ?>
+        <form action="upload" method="post">
+            <div>
+                <textarea name="text" style="width: 100%"></textarea>
+            </div>
+            <div>
+                <input type="submit" value="Завантажити таблицю" style="width: 100%; alignment: right">
+            </div>
+        </form>
+        <?php
+    }
+
     private function renderWorkersTable($post) {
         $workers = array_filter( $this->workersProvider->getWorkers(), function ($worker) use ($post) {
             return $worker->getPost() === $post;
@@ -108,11 +121,11 @@ final class MainPageHandler implements RequestHandlerInterface {
                 document.getElementById('generation-date').valueAsDate = tomorrow;
 
                 if ((tomorrow.getDay() === 0) || (tomorrow.getDay() === 6)) {
-                    document.getElementById('generation-team3count').valueAsNumber = 5;
-                    document.getElementById('generation-team2count').valueAsNumber = 3;
+                    document.getElementById('generation-team3count').checked = true;
+                    document.getElementById('generation-team2count').checked = true;
                 } else {
-                    document.getElementById('generation-team3count').valueAsNumber = 8;
-                    document.getElementById('generation-team2count').valueAsNumber = 0;
+                    document.getElementById('generation-team3count').checked = true;
+                    document.getElementById('generation-team2count').checked = false;
                 }
 
                 const form = $('#generate-form');
@@ -124,12 +137,14 @@ final class MainPageHandler implements RequestHandlerInterface {
                         $.post('/generate', form.serialize(), function (data) {
                             table.empty();
                             for (const ids of data) {
-                                let team = '';
-                                for (const id of ids) {
-                                    team += workers[id.toString()];
-                                    team += '<br>';
-                                }
-                                table.append(`<tr><td>${team}</td></tr>`);
+                                let team = ids.map(id => workers[id]).join(' - ');
+                                table.append(`
+                                    <tr><td>
+                                        <label>
+                                            <input type="checkbox"/>
+                                            ${team}
+                                        </label>
+                                    </td></tr>`);
                             }
                         });
                     }
@@ -147,13 +162,14 @@ final class MainPageHandler implements RequestHandlerInterface {
             <div>
                 <label>
                     По три людини
-                    <input id="generation-team3count" type="number" name="team3count"
+                    <input id="generation-team3count" type="checkbox" name="team3count"
                            style="width: 40px">
                 </label>
             </div>
-            <div><label>
+            <div>
+                <label>
                     По дві людини
-                    <input id="generation-team2count" type="number" name="team2count"
+                    <input id="generation-team2count" type="checkbox" name="team2count"
                            style="width: 40px">
                 </label>
             </div>
@@ -172,19 +188,6 @@ final class MainPageHandler implements RequestHandlerInterface {
                 </tbody>
             </table>
         </div>
-        <?php
-    }
-
-    private function renderUploadForm() {
-        ?>
-        <form action="upload" method="post">
-            <div>
-                <textarea name="text"></textarea>
-            </div>
-            <div>
-                <input type="submit" value="Зберегти" style="width: 100%; alignment: right">
-            </div>
-        </form>
         <?php
     }
 }

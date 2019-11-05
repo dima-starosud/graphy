@@ -57,7 +57,7 @@ final class Uploader {
                 ++$index;
             };
             while (!empty( $names[$index] )) {
-                $workers[] = new Worker( $index, $names[$index], $post );
+                $workers[$index] = new Worker( $index, $names[$index], $post );
                 ++$index;
             }
         }

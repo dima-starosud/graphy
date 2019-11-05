@@ -3,7 +3,22 @@
 namespace Staro\Graphy\Logic;
 
 final class GenerationLogic {
-    function generate(int $team2count, int $team3count, array $workers, array $history): array {
+    /**
+     * @var WorkersProvider
+     */
+    private $workersProvider;
+
+    function __construct(WorkersProvider $workersProvider) {
+        $this->workersProvider = $workersProvider;
+    }
+
+    /**
+     * @param int[] $workerIds
+     * @param int[][] $history
+     * @param int[] $teamSizes
+     * @return int[][]
+     */
+    function generate(array $workerIds, array $history, array $teamSizes): array {
         $seenPairs = [];
         foreach ($history as $team) {
             foreach (combinations( $team, 2 ) as $pair) {
@@ -11,45 +26,45 @@ final class GenerationLogic {
             }
         }
 
-        $today = [];
-
-        $total = [];
-        foreach ([[3, $team3count], [2, $team2count]] as list($membersCount, $teamsCount)) {
-            $combinations = iterator_to_array( combinations( $workers, $membersCount ) );
-            shuffle( $combinations );
-            $result = [];
-            foreach ($combinations as $combination) {
-                if (count( $result ) >= $teamsCount) break;
-
-                $used = false;
-                foreach (combinations( $combination, 2 ) as $pair) {
-                    if (($seenPairs[serialize( $pair )] ?? 0) >= 2) {
-                        $used = true;
-                        break;
-                    }
+        $result = [];
+        $combinations = $this->teamCombinations( $workerIds, $teamSizes );
+        foreach ($combinations as $team) {
+            $used = false;
+            foreach (combinations( $team, 2 ) as $pair) {
+                if (($seenPairs[serialize( $pair )] ?? 0) >= 2) {
+                    $used = true;
+                    break;
                 }
-                if ($used) continue;
-                foreach ($combination as $person) {
-                    if (in_array( $person, $today )) {
-                        $used = true;
-                        break;
-                    }
-                }
-                if ($used) continue;
-
-                $result[] = $combination;
-                foreach (combinations( $combination, 2 ) as $pair) {
-                    $seenPairs[serialize( $pair )] = 1 + ($seenPairs[serialize( $pair )] ?? 0);
-                }
-                $today = array_merge( $today, $combination );
             }
-
-            $total = array_merge( $total, $result );
+            if (!$used) {
+                $result[] = $team;
+            }
         }
 
-        return $total;
+        return $result;
+    }
+
+    private function teamCombinations($workerIds, $teamSizes) {
+        $workers = $this->workersProvider->getWorkers();
+        $groupedWorkerIds = [Worker::CARRIER => [], Worker::DRIVER => []];
+        foreach ($workerIds as $id) {
+            $groupedWorkerIds[$workers[$id]->getPost()][] = $id;
+        }
+
+        $result = array_map( function ($size) use ($groupedWorkerIds) {
+            foreach (combinations( $groupedWorkerIds[Worker::CARRIER], $size - 1 ) as $carriers) {
+                foreach ($groupedWorkerIds[Worker::DRIVER] as $driver) {
+                    yield array_merge( $carriers, [$driver] );
+                }
+            }
+        }, $teamSizes );
+
+        $result = array_map( 'iterator_to_array', $result );
+
+        return array_merge( ...$result );
     }
 }
+
 
 function combinations($items, int $combination_count) {
     if ($combination_count < 1) {
