@@ -31,7 +31,7 @@ final class GenerationLogic {
         foreach ($combinations as $team) {
             $used = false;
             foreach (combinations( $team, 2 ) as $pair) {
-                if (($seenPairs[serialize( $pair )] ?? 0) >= 2) {
+                if (($seenPairs[serialize( $pair )] ?? 0) >= $this->maxPairRepetitionCount( $pair )) {
                     $used = true;
                     break;
                 }
@@ -62,6 +62,19 @@ final class GenerationLogic {
         $result = array_map( 'iterator_to_array', $result );
 
         return array_merge( ...$result );
+    }
+
+    private function maxPairRepetitionCount($pair) {
+        $posts = array_unique( array_map( function ($id) {
+            return $this->workersProvider->getWorkers()[$id]->getPost();
+        }, $pair ) );
+        if ($posts === [Worker::DRIVER]) {
+            return 0;
+        } elseif ($posts === [Worker::CARRIER]) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
 }
 

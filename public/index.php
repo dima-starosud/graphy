@@ -43,7 +43,6 @@ $container = (new ContainerBuilder())
     ->build();
 
 $errorHandler = new StupidErrorHandler();
-
 $authHandler = new HttpBasicAuthentication( require DIR_NAME . '/private/authconfig.php' );
 
 $routes = simpleDispatcher( function (RouteCollector $r) {
