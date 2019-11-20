@@ -59,6 +59,10 @@ $dispatcher = new Dispatcher( [
 ] );
 
 $request = ServerRequestFactory::fromGlobals();
+
+$hook = DIR_NAME . '/private/hook.php';
+if (file_exists( $hook )) include $hook;
+
 $response = $dispatcher->dispatch( $request );
 $emitter = new SapiEmitter();
 return $emitter->emit( $response );
