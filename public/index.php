@@ -14,8 +14,8 @@ use Staro\Graphy\Handlers\MainPageHandler;
 use Staro\Graphy\Middlewares\StupidErrorHandler;
 use Tuupola\Middleware\HttpBasicAuthentication;
 use Middlewares\Utils\Dispatcher;
-use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
-use Zend\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Laminas\Diactoros\ServerRequestFactory;
 use function DI\create;
 use function FastRoute\simpleDispatcher;
 

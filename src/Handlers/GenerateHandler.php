@@ -10,7 +10,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Staro\Graphy\Logic\GenerationLogic;
 use Staro\Graphy\Logic\HistoryProvider;
 use Staro\Graphy\Logic\WorkersProvider;
-use Zend\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\JsonResponse;
 
 final class GenerateHandler implements RequestHandlerInterface {
     /**
@@ -47,11 +47,11 @@ final class GenerateHandler implements RequestHandlerInterface {
         $day = $date['day'];
 
         $teamSizes = [];
-        if ($params['team3count'] === 'on') {
+        if ( $params['team3count'] === 'on' ) {
             $teamSizes[] = 3;
             unset( $params['team3count'] );
         }
-        if ($params['team3count'] === 'on') {
+        if ( $params['team2count'] === 'on' ) {
             $teamSizes[] = 2;
             unset( $params['team2count'] );
         }

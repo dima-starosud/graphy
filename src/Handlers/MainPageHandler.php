@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Staro\Graphy\Logic\Worker;
 use Staro\Graphy\Logic\WorkersProvider;
-use Zend\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\HtmlResponse;
 
 final class MainPageHandler implements RequestHandlerInterface {
     /**

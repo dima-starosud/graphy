@@ -2,12 +2,15 @@ version: '3'
 
 services:
 
-  app:
-    image: composer
+  composer:
+    image: composer:1.9.1
     volumes:
       - .:/app
     working_dir: /app
+
+  apache:
+    build: docker/apache
+    volumes:
+      - .:/var/www/html
     ports:
-      - 8123:8123
-    tty: true
-    command: php -S 0.0.0.0:8123 -t public/
+      - 8123:80
