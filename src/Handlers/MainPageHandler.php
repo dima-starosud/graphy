@@ -136,13 +136,17 @@ final class MainPageHandler implements RequestHandlerInterface {
                         event.preventDefault();
                         $.post('/generate', form.serialize(), function (data) {
                             table.empty();
-                            for (const ids of data) {
-                                let team = ids.map(id => workers[id]).join(' - ');
+                            for (const team of data) {
+                                let teamHtml = team.ids.map(id => workers[id]).join(' - ');
+                                if (team.count) {
+                                    const stars = '*'.repeat(team.count);
+                                    teamHtml = `${stars} ${teamHtml}`;
+                                }
                                 table.append(`
                                     <tr><td>
                                         <label>
                                             <input type="checkbox"/>
-                                            ${team}
+                                            ${teamHtml}
                                         </label>
                                     </td></tr>`);
                             }
