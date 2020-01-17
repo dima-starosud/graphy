@@ -18,6 +18,7 @@
     "laminas/laminas-json": "3.1.0",
     "laminas/laminas-db": "2.9.3",
     "tuupola/slim-basic-auth": "3.2.1",
+    "google/apiclient": "^2.0",
     "ext-json": "*"
   },
   "autoload": {

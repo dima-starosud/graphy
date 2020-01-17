@@ -7,11 +7,14 @@ use Middlewares\FastRoute;
 use Middlewares\RequestHandler;
 use Middlewares\Utils\Factory\DiactorosFactory;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Staro\Graphy\GoogleApi\GoogleServiceSheetsProvider;
+use Staro\Graphy\Handlers\SyncHandler;
 use Staro\Graphy\Handlers\UploadHandler;
 use Staro\Graphy\Logic\FileCache;
 use Staro\Graphy\Handlers\GenerateHandler;
 use Staro\Graphy\Handlers\MainPageHandler;
 use Staro\Graphy\Middlewares\StupidErrorHandler;
+use Staro\Graphy\Utils\GoogleSheetConfig;
 use Tuupola\Middleware\HttpBasicAuthentication;
 use Middlewares\Utils\Dispatcher;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -24,7 +27,7 @@ define( 'DIR_NAME', dirname( __DIR__ ) );
 require_once DIR_NAME . '/vendor/autoload.php';
 
 set_error_handler( function ($severity, $message, $file, $line) {
-    if (!(error_reporting() & $severity)) {
+    if ( !(error_reporting() & $severity) ) {
         // This error code is not included in error_reporting
         return;
     }
@@ -35,10 +38,16 @@ set_error_handler( function ($severity, $message, $file, $line) {
 $container = (new ContainerBuilder())
     ->useAnnotations( false )
     ->addDefinitions( [
-        ResponseFactoryInterface::class => create( DiactorosFactory::class ),
-        FileCache::class                => function () {
+        ResponseFactoryInterface::class    => create( DiactorosFactory::class ),
+        FileCache::class                   => function () {
             return new FileCache( DIR_NAME . '/private/cache' );
         },
+        GoogleServiceSheetsProvider::class => function () {
+            return new GoogleServiceSheetsProvider( DIR_NAME . '/private/google' );
+        },
+        GoogleSheetConfig::class           => function () {
+            return new GoogleSheetConfig( require DIR_NAME . '/private/googlesheetconfig.php' );
+        }
     ] )
     ->build();
 
@@ -49,6 +58,7 @@ $routes = simpleDispatcher( function (RouteCollector $r) {
     $r->get( '/', MainPageHandler::class );
     $r->post( '/generate', GenerateHandler::class );
     $r->post( '/upload', UploadHandler::class );
+    $r->post( '/sync', SyncHandler::class );
 } );
 
 $dispatcher = new Dispatcher( [
@@ -61,7 +71,7 @@ $dispatcher = new Dispatcher( [
 $request = ServerRequestFactory::fromGlobals();
 
 $hook = DIR_NAME . '/private/hook.php';
-if (file_exists( $hook )) include $hook;
+if ( file_exists( $hook ) ) include $hook;
 
 $response = $dispatcher->dispatch( $request );
 $emitter = new SapiEmitter();

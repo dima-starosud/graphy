@@ -16,18 +16,14 @@ final class Uploader {
         $this->cache = $cache;
     }
 
-    public function upload(string $text) {
-        list( $workers, $history ) = $this->parseTable( $text );
+    public function upload(array $table) {
+        list( $workers, $history ) = $this->parseTable( $table );
 
         $this->cache->set( 'workers', $workers );
         $this->cache->set( 'history', $history );
     }
 
-    static function parseTable(string $text) {
-        $table = array_map( function ($line) {
-            return explode( "\t", $line );
-        }, explode( "\n", $text ) );
-
+    static function parseTable(array $table) {
         $table = array_map( null, ...$table );
 
         $workers = $table[0];
@@ -72,7 +68,7 @@ final class Uploader {
             $teams = [];
             foreach ($indexes as $index) {
                 $team = intval( $day[$index] );
-                if ($team == 0) continue;
+                if ( $team == 0 ) continue;
                 $teams[$team] = $teams[$team] ?? [];
                 $teams[$team][] = $index;
             }

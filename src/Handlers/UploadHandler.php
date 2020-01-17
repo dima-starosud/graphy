@@ -24,7 +24,13 @@ final class UploadHandler implements RequestHandlerInterface {
      * @inheritDoc
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
-        $this->uploader->upload( $request->getParsedBody()['text'] );
+        $text = $request->getParsedBody()['text'];
+
+        $table = array_map( function ($line) {
+            return explode( "\t", $line );
+        }, explode( "\n", $text ) );
+
+        $this->uploader->upload( $table );
         return new RedirectResponse( '/' );
     }
 }

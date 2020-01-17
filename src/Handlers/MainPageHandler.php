@@ -39,8 +39,14 @@ final class MainPageHandler implements RequestHandlerInterface {
         </head>
         <body>
 
-        <div style="float: left; margin: 10px; border: 2px solid black; padding: 5px">
-            <?php $this->renderUploadForm() ?>
+        <div style="float: left">
+            <div style="margin: 10px; border: 2px solid black; padding: 5px">
+                <?php $this->renderSyncForm() ?>
+            </div>
+
+            <div style="margin: 10px; border: 2px solid black; padding: 5px">
+                <?php $this->renderUploadForm() ?>
+            </div>
         </div>
 
         <form id="generate-form">
@@ -68,6 +74,16 @@ final class MainPageHandler implements RequestHandlerInterface {
 
         <?php
         return new HtmlResponse( ob_get_clean() );
+    }
+
+    private function renderSyncForm() {
+        ?>
+        <form action="sync" method="post">
+            <div>
+                <input type="submit" value="Синхронізувати таблицю" style="width: 100%; alignment: right">
+            </div>
+        </form>
+        <?php
     }
 
     private function renderUploadForm() {
