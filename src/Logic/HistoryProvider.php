@@ -1,8 +1,8 @@
 <?php
 
-
 namespace Staro\Graphy\Logic;
 
+use Staro\Graphy\Utils\FileCache;
 
 final class HistoryProvider {
     const CACHE_KEY = 'history';

@@ -9,8 +9,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Staro\Graphy\GoogleApi\GoogleServiceSheetsProvider;
+use Staro\Graphy\GoogleApi\GoogleSheetConfig;
 use Staro\Graphy\Logic\Uploader;
-use Staro\Graphy\Utils\GoogleSheetConfig;
 
 final class SyncHandler implements RequestHandlerInterface {
     /**

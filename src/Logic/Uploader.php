@@ -3,6 +3,7 @@
 
 namespace Staro\Graphy\Logic;
 
+use Staro\Graphy\Utils\FileCache;
 
 final class Uploader {
     const WORKERS_FIRST_INDEX = 3;

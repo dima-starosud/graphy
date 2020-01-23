@@ -1,16 +1,16 @@
 <?php
 
 
-namespace Staro\Graphy\Utils;
+namespace Staro\Graphy\GoogleApi;
 
 
 final class GoogleSheetConfig {
     private $id;
     private $range;
 
-    function __construct($config) {
-        $this->id = $config['id'];
-        $this->range = $config['range'];
+    function __construct(string $id, string $range) {
+        $this->id = $id;
+        $this->range = $range;
     }
 
     function getId(): string {

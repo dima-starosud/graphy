@@ -7,14 +7,11 @@ use Middlewares\FastRoute;
 use Middlewares\RequestHandler;
 use Middlewares\Utils\Factory\DiactorosFactory;
 use Psr\Http\Message\ResponseFactoryInterface;
-use Staro\Graphy\GoogleApi\GoogleServiceSheetsProvider;
 use Staro\Graphy\Handlers\SyncHandler;
 use Staro\Graphy\Handlers\UploadHandler;
-use Staro\Graphy\Logic\FileCache;
 use Staro\Graphy\Handlers\GenerateHandler;
 use Staro\Graphy\Handlers\MainPageHandler;
 use Staro\Graphy\Middlewares\StupidErrorHandler;
-use Staro\Graphy\Utils\GoogleSheetConfig;
 use Tuupola\Middleware\HttpBasicAuthentication;
 use Middlewares\Utils\Dispatcher;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -37,22 +34,11 @@ set_error_handler( function ($severity, $message, $file, $line) {
 /** @noinspection PhpUnhandledExceptionInspection */
 $container = (new ContainerBuilder())
     ->useAnnotations( false )
-    ->addDefinitions( [
-        ResponseFactoryInterface::class    => create( DiactorosFactory::class ),
-        FileCache::class                   => function () {
-            return new FileCache( DIR_NAME . '/private/cache' );
-        },
-        GoogleServiceSheetsProvider::class => function () {
-            return new GoogleServiceSheetsProvider( DIR_NAME . '/private/google' );
-        },
-        GoogleSheetConfig::class           => function () {
-            return new GoogleSheetConfig( require DIR_NAME . '/private/googlesheetconfig.php' );
-        }
-    ] )
+    ->addDefinitions( array_merge(
+        require DIR_NAME . '/private/config.php',
+        [ResponseFactoryInterface::class => create( DiactorosFactory::class )]
+    ) )
     ->build();
-
-$errorHandler = new StupidErrorHandler();
-$authHandler = new HttpBasicAuthentication( require DIR_NAME . '/private/authconfig.php' );
 
 $routes = simpleDispatcher( function (RouteCollector $r) {
     $r->get( '/', MainPageHandler::class );
@@ -61,9 +47,10 @@ $routes = simpleDispatcher( function (RouteCollector $r) {
     $r->post( '/sync', SyncHandler::class );
 } );
 
+/** @noinspection PhpUnhandledExceptionInspection */
 $dispatcher = new Dispatcher( [
-    $errorHandler,
-    $authHandler,
+    new StupidErrorHandler(),
+    $container->get( HttpBasicAuthentication::class ),
     new FastRoute( $routes ),
     new RequestHandler( $container ),
 ] );

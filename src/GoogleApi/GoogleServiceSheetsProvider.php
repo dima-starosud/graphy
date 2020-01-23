@@ -10,12 +10,12 @@ use Google_Service_Sheets;
 
 final class GoogleServiceSheetsProvider {
     /**
-     * @var string
+     * @var GoogleServiceSheetsProviderConfig
      */
-    private $googleDir;
+    private $config;
 
-    function __construct(string $googleDir) {
-        $this->googleDir = $googleDir;
+    function __construct(GoogleServiceSheetsProviderConfig $config) {
+        $this->config = $config;
     }
 
     function getService(): Google_Service_Sheets {
@@ -73,7 +73,7 @@ final class GoogleServiceSheetsProvider {
     }
 
     private function path(string $file): string {
-        $dir = $this->googleDir;
+        $dir = $this->config->getBaseDir();
         return "$dir/$file";
     }
 }

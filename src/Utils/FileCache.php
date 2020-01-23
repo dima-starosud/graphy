@@ -1,17 +1,17 @@
 <?php
 
 
-namespace Staro\Graphy\Logic;
+namespace Staro\Graphy\Utils;
 
 
 final class FileCache {
     /**
-     * @var string
+     * @var FileCacheConfig
      */
-    private $dir;
+    private $config;
 
-    function __construct(string $dir) {
-        $this->dir = $dir;
+    function __construct(FileCacheConfig $config) {
+        $this->config = $config;
     }
 
     /**
@@ -21,7 +21,7 @@ final class FileCache {
      */
     function get(string $name, $default = null) {
         $file = $this->file( $name );
-        if (file_exists( $file ))
+        if ( file_exists( $file ) )
             return require $file;
         return $default;
     }
@@ -29,13 +29,13 @@ final class FileCache {
     function set(string $name, $value) {
         $file = $this->file( $name );
         $value = var_export( $value, true );
-        if (!file_exists( dirname( $file ) ))
+        if ( !file_exists( dirname( $file ) ) )
             mkdir( dirname( $file ), 0777, true );
         file_put_contents( $file, "<?php return $value;" );
     }
 
     function file(string $name): string {
         $name = hash( 'md5', $name );
-        return $this->dir . '/' . $name . '.php';
+        return $this->config->getDir() . '/' . $name . '.php';
     }
 }

@@ -3,6 +3,7 @@
 
 namespace Staro\Graphy\Logic;
 
+use Staro\Graphy\Utils\FileCache;
 
 final class WorkersProvider {
     const CACHE_KEY = 'workers';
