@@ -7,6 +7,7 @@ namespace Staro\Graphy\Handlers;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Staro\Graphy\Logic\NextDayProvider;
 use Staro\Graphy\Logic\Worker;
 use Staro\Graphy\Logic\WorkersProvider;
 use Laminas\Diactoros\Response\HtmlResponse;
@@ -16,9 +17,17 @@ final class MainPageHandler implements RequestHandlerInterface {
      * @var WorkersProvider
      */
     private $workersProvider;
+    /**
+     * @var NextDayProvider
+     */
+    private $nextDayProvider;
 
-    public function __construct(WorkersProvider $workersProvider) {
+    public function __construct(
+        WorkersProvider $workersProvider,
+        NextDayProvider $nextDayProvider
+    ) {
         $this->workersProvider = $workersProvider;
+        $this->nextDayProvider = $nextDayProvider;
     }
 
     /**
@@ -132,17 +141,8 @@ final class MainPageHandler implements RequestHandlerInterface {
             const workers = <?= json_encode( $workers ) ?>;
 
             $(document).ready(function () {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                document.getElementById('generation-date').valueAsDate = tomorrow;
-
-                if ((tomorrow.getDay() === 0) || (tomorrow.getDay() === 6)) {
-                    document.getElementById('generation-team3count').checked = true;
-                    document.getElementById('generation-team2count').checked = true;
-                } else {
-                    document.getElementById('generation-team3count').checked = true;
-                    document.getElementById('generation-team2count').checked = false;
-                }
+                document.getElementById('generation-date').valueAsDate =
+                    new Date("<?= $this->nextDayProvider->getNextDay() ?>");
 
                 const form = $('#generate-form');
                 const table = $('#generation-table-body');
@@ -183,6 +183,7 @@ final class MainPageHandler implements RequestHandlerInterface {
                 <label>
                     По три людини
                     <input id="generation-team3count" type="checkbox" name="team3count"
+                           checked
                            style="width: 40px">
                 </label>
             </div>

@@ -15,8 +15,13 @@ final class HistoryProvider {
         $this->cache = $cache;
     }
 
-    function getHistory(int $day): array {
+    function getHistory(int $day = 0): array {
         $history = $this->cache->get( static::CACHE_KEY, [] );
+
+        if ($day < 1) {
+            return $history;
+        }
+
         $result = [];
         foreach (range( 1, $day - 1 ) as $day) {
             $result = array_merge( $result, $history[$day] ?? [] );

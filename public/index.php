@@ -24,7 +24,7 @@ define( 'DIR_NAME', dirname( __DIR__ ) );
 require_once DIR_NAME . '/vendor/autoload.php';
 
 set_error_handler( function ($severity, $message, $file, $line) {
-    if ( !(error_reporting() & $severity) ) {
+    if (!(error_reporting() & $severity)) {
         // This error code is not included in error_reporting
         return;
     }
@@ -57,8 +57,7 @@ $dispatcher = new Dispatcher( [
 
 $request = ServerRequestFactory::fromGlobals();
 
-$hook = DIR_NAME . '/private/hook.php';
-if ( file_exists( $hook ) ) include $hook;
+@include DIR_NAME . '/private/hook.php';
 
 $response = $dispatcher->dispatch( $request );
 $emitter = new SapiEmitter();
