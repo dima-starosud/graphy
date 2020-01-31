@@ -9,6 +9,7 @@ use Middlewares\Utils\Factory\DiactorosFactory;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Staro\Graphy\Handlers\SyncHandler;
 use Staro\Graphy\Handlers\UploadHandler;
+use Staro\Graphy\Handlers\WorkersHandler;
 use Staro\Graphy\Handlers\GenerateHandler;
 use Staro\Graphy\Handlers\MainPageHandler;
 use Staro\Graphy\Middlewares\StupidErrorHandler;
@@ -24,7 +25,7 @@ define( 'DIR_NAME', dirname( __DIR__ ) );
 require_once DIR_NAME . '/vendor/autoload.php';
 
 set_error_handler( function ($severity, $message, $file, $line) {
-    if (!(error_reporting() & $severity)) {
+    if ( !(error_reporting() & $severity) ) {
         // This error code is not included in error_reporting
         return;
     }
@@ -42,6 +43,7 @@ $container = (new ContainerBuilder())
 
 $routes = simpleDispatcher( function (RouteCollector $r) {
     $r->get( '/', MainPageHandler::class );
+    $r->get( '/workers', WorkersHandler::class );
     $r->post( '/generate', GenerateHandler::class );
     $r->post( '/upload', UploadHandler::class );
     $r->post( '/sync', SyncHandler::class );
@@ -50,7 +52,7 @@ $routes = simpleDispatcher( function (RouteCollector $r) {
 /** @noinspection PhpUnhandledExceptionInspection */
 $dispatcher = new Dispatcher( [
     new StupidErrorHandler(),
-    $container->get( HttpBasicAuthentication::class ),
+//    $container->get( HttpBasicAuthentication::class ),
     new FastRoute( $routes ),
     new RequestHandler( $container ),
 ] );
@@ -60,5 +62,6 @@ $request = ServerRequestFactory::fromGlobals();
 @include DIR_NAME . '/private/hook.php';
 
 $response = $dispatcher->dispatch( $request );
+$response = $response->withHeader( 'Access-Control-Allow-Origin', '*' );
 $emitter = new SapiEmitter();
 return $emitter->emit( $response );

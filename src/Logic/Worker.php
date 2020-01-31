@@ -4,9 +4,11 @@
 namespace Staro\Graphy\Logic;
 
 
-final class Worker {
-    const CARRIER = 0;
-    const DRIVER = 1;
+use \JsonSerializable;
+
+final class Worker implements JsonSerializable {
+    const CARRIER = "CARRIER";
+    const DRIVER = "DRIVER";
 
     private $index;
     private $name;
@@ -32,5 +34,16 @@ final class Worker {
 
     public function getPost() {
         return $this->post;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize() {
+        return [
+            'index' => $this->getIndex(),
+            'name'  => $this->getName(),
+            'post'  => $this->getPost(),
+        ];
     }
 }
