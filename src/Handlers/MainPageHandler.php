@@ -53,7 +53,8 @@ final class MainPageHandler implements RequestHandlerInterface {
                 <?php $this->renderSyncForm() ?>
             </div>
 
-            <div style="margin: 10px; border: 2px solid black; padding: 5px">
+            <div style="margin: 10px; border: 2px solid black; padding: 5px;
+                        display: none">
                 <?php $this->renderUploadForm() ?>
             </div>
         </div>
