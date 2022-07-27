@@ -13,7 +13,7 @@
     "psr/http-factory": "1.0.0",
     "middlewares/fast-route": "1.1.0",
     "middlewares/request-handler": "1.2.0",
-    "laminas/laminas-diactoros": "1.8.4",
+    "laminas/laminas-diactoros": "2.11.1",
     "laminas/laminas-httphandlerrunner": "1.0.1",
     "laminas/laminas-json": "3.1.0",
     "laminas/laminas-db": "2.9.3",
